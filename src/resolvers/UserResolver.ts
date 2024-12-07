@@ -213,6 +213,7 @@ export class UserResolver {
     @Arg("password") password: string
   ): Promise<User> {
     const userRepository = AppDataSource.getRepository(User);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = userRepository.create({
       firstName,
@@ -223,7 +224,7 @@ export class UserResolver {
       type,
       status,
       organizationId,
-      password,
+      password :hashedPassword,
     });
 
     return await userRepository.save(newUser);
@@ -259,10 +260,21 @@ async editUser(
   if (status !== undefined) user.status = status;
   if (organizationId !== undefined) user.organizationId = organizationId;
   if (password !== undefined) user.password = password;
-  
+
   const updatedUser = await userRepository.save(user);
 
   return updatedUser;
+}
+
+@Mutation(() => Boolean)
+async deleteUsers(@Arg("ids", () => [Number]) ids: number[]): Promise<boolean> {
+  const userRepository = AppDataSource.getRepository(User);
+  const users = await userRepository.findByIds(ids);
+  if (users.length === 0) {
+    throw new Error("No users found with the provided IDs");
+  }
+  await userRepository.remove(users);
+  return true;
 }
 
 }
