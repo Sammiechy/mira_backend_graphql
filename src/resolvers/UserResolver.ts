@@ -199,6 +199,72 @@ export class UserResolver {
       };
     }
   }
+
+  @Mutation(() => User)
+  async addUser(
+    @Arg("firstName") firstName: string,
+    @Arg("lastName") lastName: string,
+    @Arg("email") email: string,
+    @Arg("phone") phone: string,
+    @Arg("role") role: string,
+    @Arg("type") type: string,
+    @Arg("status") status: string,
+    @Arg("organizationId") organizationId: number,
+    @Arg("password") password: string
+  ): Promise<User> {
+    const userRepository = AppDataSource.getRepository(User);
+
+    const newUser = userRepository.create({
+      firstName,
+      lastName,
+      email,
+      phone,
+      role,
+      type,
+      status,
+      organizationId,
+      password,
+    });
+
+    return await userRepository.save(newUser);
+  }
+
+  @Mutation(() => User)
+async editUser(
+  @Arg("id") id: number,
+  @Arg("firstName", { nullable: true }) firstName?: string,
+  @Arg("lastName", { nullable: true }) lastName?: string,
+  @Arg("email", { nullable: true }) email?: string,
+  @Arg("phone", { nullable: true }) phone?: string,
+  @Arg("role", { nullable: true }) role?: string,
+  @Arg("type", { nullable: true }) type?: string,
+  @Arg("status", { nullable: true }) status?: string,
+  @Arg("organizationId", { nullable: true }) organizationId?: number,
+  @Arg("password", { nullable: true }) password?: string
+): Promise<User> {
+  const userRepository = AppDataSource.getRepository(User);
+
+  const user = await userRepository.findOne({ where: { id } });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  if (firstName !== undefined) user.firstName = firstName;
+  if (lastName !== undefined) user.lastName = lastName;
+  if (email !== undefined) user.email = email;
+  if (phone !== undefined) user.phone = phone;
+  if (role !== undefined) user.role = role;
+  if (type !== undefined) user.type = type;
+  if (status !== undefined) user.status = status;
+  if (organizationId !== undefined) user.organizationId = organizationId;
+  if (password !== undefined) user.password = password;
+  
+  const updatedUser = await userRepository.save(user);
+
+  return updatedUser;
+}
+
 }
 //---------------------------------------------------------------------------------------------------
 // export const UserResolver = {
