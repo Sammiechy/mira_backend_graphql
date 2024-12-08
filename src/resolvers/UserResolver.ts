@@ -8,6 +8,7 @@ import { Organization } from '../entities/Organization';
 import { generateToken } from '../utils/jwt';
 import { signUpUser } from '../utils/cognito';
 import { BlacklistedToken } from '../entities/TokenEntity';
+import crypto from "crypto";
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 
 // import { sendResetEmail } from "../utils/emailUtils";
@@ -277,7 +278,29 @@ async deleteUsers(@Arg("ids", () => [Number]) ids: number[]): Promise<boolean> {
   return true;
 }
 
+@Mutation(() => Boolean)
+async reset_Password(
+  @Arg("id") id: number, // User's ID to identify the user
+  @Arg("newPassword") newPassword: string
+): Promise<boolean> {
+  const userRepository = AppDataSource.getRepository(User);
+
+  // Step 1: Fetch the user by ID
+  const user = await userRepository.findOne({ where: { id } });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  user.password = hashedPassword;
+  await userRepository.save(user);
+
+  return true; 
 }
+}
+
 //---------------------------------------------------------------------------------------------------
 // export const UserResolver = {
 //   Query: {

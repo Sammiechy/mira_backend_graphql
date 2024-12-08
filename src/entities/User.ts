@@ -64,6 +64,7 @@ password!: string;
   //   @Column({ default: false })
   //   isDeleted!: boolean;
   // password: string | undefined;
+
 }
 
 @ObjectType()
