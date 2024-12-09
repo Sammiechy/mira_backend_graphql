@@ -10,7 +10,7 @@ import { signUpUser } from '../utils/cognito';
 import { BlacklistedToken } from '../entities/TokenEntity';
 import crypto from "crypto";
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
-
+import { Not } from "typeorm";
 // import { sendResetEmail } from "../utils/emailUtils";
 
 const userRepository = AppDataSource.getRepository(User);
@@ -72,9 +72,17 @@ const userRepository = AppDataSource.getRepository(User);
 @Resolver(User)
 export class UserResolver {
   @Query(() => [User])
-  async users(): Promise<User[]> {
+  async users(@Arg("excludeId", { nullable: true }) excludeId?: number): Promise<User[]> {
     try {
-      return await AppDataSource.getRepository(User).find();
+      const userRepository = AppDataSource.getRepository(User);
+      if (excludeId) {
+
+          return await userRepository.find({
+            where: { id: Not(excludeId) },
+          });
+        
+      }
+      return await userRepository.find();
     } catch (error) {
       throw new Error("Error fetching users");
     }
