@@ -72,20 +72,34 @@ const userRepository = AppDataSource.getRepository(User);
 @Resolver(User)
 export class UserResolver {
   @Query(() => [User])
-  async users(@Arg("excludeId", { nullable: true }) excludeId?: number): Promise<User[]> {
+  async users(
+    @Arg('limit', { defaultValue: 10 }) limit: number,
+    @Arg('offset', { defaultValue: 0 }) offset: number,
+    @Arg('excludeId', { nullable: true }) excludeId?: number,
+  ): Promise<User[]> {
     try {
       const userRepository = AppDataSource.getRepository(User);
+      const query = userRepository.createQueryBuilder('user')
+      .take(limit)
+      .skip(offset);
       if (excludeId) {
-
-          return await userRepository.find({
-            where: { id: Not(excludeId) },
-          });
+        if (excludeId) {
+          query.where('user.id != :excludeId', { excludeId });
+        }
         
       }
-      return await userRepository.find();
+      return query.getMany();
+    
+      
+     
     } catch (error) {
       throw new Error("Error fetching users");
     }
+  }
+  @Query(() => Number) // To fetch total count for pagination
+  async userCount() {
+    const userRepository =  AppDataSource.getRepository(User);
+    return await userRepository.count();
   }
 
   @Mutation(() => SignUpResponse)
