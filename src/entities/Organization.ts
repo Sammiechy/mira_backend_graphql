@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Field, InputType, ObjectType } from 'type-graphql';
+import { Field, InputType, Int, ObjectType } from 'type-graphql';
 import { User } from './User';
 
 @ObjectType()
@@ -66,4 +66,13 @@ export class AddOrganizationResponse {
 
   @Field(() => Organization, { nullable: true })
   organization: Organization | undefined;
+}
+
+@ObjectType()
+export class PaginatedOrganizations {
+  @Field(() => [Organization])
+  organizations: Organization[] | undefined;
+
+  @Field(() => Int)
+  totalCount: number | undefined;
 }
