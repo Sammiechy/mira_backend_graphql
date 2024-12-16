@@ -2,7 +2,6 @@
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.699.0",
     "apollo-server-express": "^3.13.0",
-    "aws-sdk": "^2.1692.0",
     "bcryptjs": "^2.4.3",
     "class-validator": "^0.14.1",
     "dotenv": "^16.4.5",

@@ -4,7 +4,6 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { AppDataSource } from '../data-source';
 import { SignInResponse, SignOutResponse, SignUpResponse, User } from '../entities/User';
-import { Organization } from '../entities/Organization';
 import { generateToken } from '../utils/jwt';
 import { signUpUser } from '../utils/cognito';
 import { BlacklistedToken } from '../entities/TokenEntity';
@@ -89,9 +88,6 @@ export class UserResolver {
         
       }
       return query.getMany();
-    
-      
-     
     } catch (error) {
       throw new Error("Error fetching users");
     }

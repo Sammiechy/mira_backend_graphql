@@ -1,6 +1,5 @@
-// src/entities/Organization.ts
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Field, ObjectType } from 'type-graphql';
+import { Field, InputType, ObjectType } from 'type-graphql';
 import { User } from './User';
 
 @ObjectType()
@@ -12,11 +11,23 @@ export class Organization {
 
   @Field()
     @Column()
-    name!: string;
+    Name!: string;
 
-  @Field()
+    @Field(() => Number,{ nullable: true })
+    @Column({ default: 0 })
+    LocationID!: number;
+  
+    @Field()
     @Column()
-    address!: string;
+    Website!: string;
+
+    @Field()
+    @Column()
+    Phone!: string;
+
+    @Field()
+    @Column()
+    Email!: string;
 
   @OneToMany(() => User, (user) => user.organizationId)
     users!: User[];
@@ -24,4 +35,35 @@ export class Organization {
   @Field()
     @Column({ default: false })
     isDeleted!: boolean;
+}
+
+@InputType()
+export class OrganizationInput {
+  @Field(() => String,{ nullable: true })
+  message: string | undefined;
+
+  @Field()
+  Name!: string;
+
+  @Field(() => Number,{ nullable: true })
+  @Column({ default: 0 })
+  LocationID!: number;
+
+  @Field()
+  Website!: string;
+
+  @Field()
+  Phone!: string;
+
+  @Field()
+  Email!: string;
+}
+
+@ObjectType()
+export class AddOrganizationResponse {
+  @Field(() => String,{ nullable: true })
+  message: string | undefined;
+
+  @Field(() => Organization, { nullable: true })
+  organization: Organization | undefined;
 }
