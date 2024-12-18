@@ -24,6 +24,31 @@ try{
     }
    }
 
+   @Mutation(() => Boolean)
+   async deleteMultipleOrganizations(
+    @Arg('ids', () => [Int]) ids: number[]
+  ): Promise<boolean> {
+    try {
+      if (ids.length === 0) {
+        throw new Error('No organization IDs provided.');
+      }
+      const result :any = await this.organizationRepository
+      .createQueryBuilder()
+      .update(Organization)
+      .set({ isDeleted: true })
+      .whereInIds(ids)
+      .execute();
+
+      console.log('Query execution result:', result);
+
+      return result.affected > 0;
+
+    }catch(error){
+      console.error('Error deleting organizations:', error);
+      throw new Error('Failed to delete organizations.');
+    }
+  }
+
    @Query(() =>PaginatedOrganizations)
    async getOrganizations(
      @Arg('page', () => Int, { defaultValue: 1 }) page: number,
@@ -37,9 +62,10 @@ try{
       
        const skip = (page - 1) * limit; // Calculate the offset
        const organizations = await this.organizationRepository.find({
-         skip,
-         take: limit,
-       });
+        where: { isDeleted: false }, // Fetch only active organizations
+        skip,
+        take: limit,
+      });
 
        const totalCount = await this.organizationRepository.count();
        return { organizations, totalCount };
