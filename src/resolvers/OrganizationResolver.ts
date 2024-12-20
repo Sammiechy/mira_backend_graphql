@@ -1,4 +1,4 @@
-import { AddOrganizationResponse, Organization, OrganizationInput, PaginatedOrganizations } from '../entities/Organization';
+import { AddOrganizationResponse, EditOrganizationResponse, Organization, OrganizationInput, PaginatedOrganizations } from '../entities/Organization';
 import { Resolver, Query, Mutation, Arg, Ctx, Int } from 'type-graphql';
 import { AppDataSource } from '../data-source';
 
@@ -74,5 +74,56 @@ try{
        throw new Error('Failed to fetch organizations.');
      }
    }
+
+   @Query(() => Organization, { nullable: true })
+   async getOrganizationById(
+     @Arg('id', () => Int) id: number
+   ): Promise<Organization | null> {
+     try {
+       const organization = await this.organizationRepository.findOne({
+         where: { id, isDeleted: false }, // Ensure it hasn't been soft-deleted
+       });
+ 
+       if (!organization) {
+         throw new Error('Organization not found.');
+       }
+ 
+       return organization;
+     } catch (error) {
+       console.error('Error fetching organization by ID:', error);
+       throw new Error('Failed to fetch organization by ID.');
+     }
+   }
+
+   @Mutation(() => EditOrganizationResponse)
+async editOrganization(
+  @Arg('id', () => Int) id: number,
+  @Arg('data', () => OrganizationInput) data: Partial<OrganizationInput>
+): Promise<AddOrganizationResponse> {
+  try {
+    // Find the organization by ID
+    const organization = await this.organizationRepository.findOne({
+      where: { id, isDeleted: false },
+    });
+
+    if (!organization) {
+      throw new Error('Organization not found.');
+    }
+
+    // Update the organization with new data
+    Object.assign(organization, data);
+
+    // Save the updated organization
+    await this.organizationRepository.save(organization);
+
+    return {
+      message: 'Organization updated successfully',
+      success: true,
+    };
+  } catch (error) {
+    console.error('Error updating organization:', error);
+    throw new Error('Failed to update organization.');
+  }
+}
 
     }

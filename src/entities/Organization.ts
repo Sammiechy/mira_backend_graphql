@@ -76,3 +76,15 @@ export class PaginatedOrganizations {
   @Field(() => Int)
   totalCount: number | undefined;
 }
+
+@ObjectType()
+export class EditOrganizationResponse {
+  @Field(() => String)
+  message: string | undefined;
+
+  @Field(() => Boolean, { defaultValue: true })
+  success: boolean | undefined;
+
+  @Field(() => Organization, { nullable: true })
+  organization?: Organization;
+}
