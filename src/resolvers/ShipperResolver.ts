@@ -13,7 +13,7 @@ export class ShipperResolver {
     @Arg("Phone") Phone: string,
     @Arg("Email") Email: string,
     @Arg("organizationId") organizationId: number
-  ): Promise<Shipper> {
+  ): Promise<CreateShipperResponse> {
 
     const shipperData :any = this.shipperRepository.create({
         Name,

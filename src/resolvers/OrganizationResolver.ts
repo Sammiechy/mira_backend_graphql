@@ -10,7 +10,7 @@ private organizationRepository =AppDataSource.getRepository(Organization);
 @Mutation(() => AddOrganizationResponse)
 async addOrganization(
 @Arg('data') data: OrganizationInput
-): Promise<Organization>{
+): Promise<AddOrganizationResponse>{
 try{
     const organization: any = this.organizationRepository.create(data);
     await this.organizationRepository.save(organization);
@@ -99,7 +99,7 @@ try{
 async editOrganization(
   @Arg('id', () => Int) id: number,
   @Arg('data', () => OrganizationInput) data: Partial<OrganizationInput>
-): Promise<AddOrganizationResponse> {
+): Promise<EditOrganizationResponse> {
   try {
     // Find the organization by ID
     const organization = await this.organizationRepository.findOne({
