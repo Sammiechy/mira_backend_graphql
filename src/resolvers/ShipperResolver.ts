@@ -1,6 +1,6 @@
 import { Resolver, Query, Mutation, Arg, Ctx, Int } from 'type-graphql';
 import { AppDataSource } from '../data-source';
-import { CreateShipperResponse, PaginatedShippers, Shipper } from '../entities/Shipper';
+import { CreateShipperResponse, EditShipperResponse, PaginatedShippers, Shipper, ShipperInput } from '../entities/Shipper';
 
 
 @Resolver(Shipper)
@@ -30,6 +30,26 @@ export class ShipperResolver {
       }
       }
 
+         @Query(() => Shipper, { nullable: true })
+         async getShipperById(
+           @Arg('id', () => Int) id: number
+         ): Promise<Shipper | null> {
+           try {
+             const shipper = await this.shipperRepository.findOne({
+               where: { id, isDeleted: false }, // Ensure it hasn't been soft-deleted
+             });
+       
+             if (!shipper) {
+               throw new Error('Organization not found.');
+             }
+       
+             return shipper;
+           } catch (error) {
+             console.error('Error fetching shipper by ID:', error);
+             throw new Error('Failed to fetch shipper by ID.');
+           }
+         }
+
     @Mutation(() => Boolean)
      async deleteMultipleShipper(
         @Arg('ids', () => [Int]) ids: number[]
@@ -54,6 +74,39 @@ export class ShipperResolver {
             throw new Error('Failed to delete shipper.');
           }
         }
+
+         @Mutation(() => EditShipperResponse)
+     async editShipper(
+       @Arg('id', () => Int) id: number,
+       @Arg('data', () => ShipperInput) data: Partial<ShipperInput>
+     ): Promise<EditShipperResponse> {
+      
+      try {
+        // Find the organization by ID
+        const shipper = await this.shipperRepository.findOne({
+          where: { id, isDeleted: false },
+        });
+    
+        if (!shipper) {
+          throw new Error('Organization not found.');
+        }
+    
+        // Update the organization with new data
+        Object.assign(shipper, data);
+    
+        // Save the updated organization
+        await this.shipperRepository.save(shipper);
+    
+        return {
+          message: 'Shipper updated successfully',
+          success: true,
+        };
+      } catch (error) {
+        console.error('Error updating shipper:', error);
+        throw new Error('Failed to update shipper.');
+      }
+
+     }
   
            @Query(() =>PaginatedShippers)
            async getShippers(

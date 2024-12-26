@@ -36,6 +36,41 @@ export class Shipper {
     isDeleted!: boolean;
 }
 
+@InputType()
+export class ShipperInput {
+  @Field(() => String,{ nullable: true })
+  message: string | undefined;
+
+  @Field()
+  Name!: string;
+
+  @Field(() => Number,{ nullable: true })
+  @Column({ default: 0 })
+  LocationID!: number;
+
+  @Field()
+  @Column()
+  organizationId!: number;
+
+  @Field()
+  Phone!: string;
+
+  @Field()
+  Email!: string;
+}
+
+@ObjectType()
+export class EditShipperResponse {
+  @Field(() => String)
+  message: string | undefined;
+
+  @Field(() => Boolean, { defaultValue: true })
+  success: boolean | undefined;
+
+  @Field(() => Shipper, { nullable: true })
+  shipper?: Shipper;
+}
+
 @ObjectType()
 export class PaginatedShippers {
   @Field(() => [Shipper])
