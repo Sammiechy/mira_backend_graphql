@@ -36,8 +36,43 @@ export class Reciever {
     isDeleted!: boolean;
 }
 
+@InputType()
+export class RecieverInput {
+  @Field(() => String,{ nullable: true })
+  message: string | undefined;
+
+  @Field()
+  Name!: string;
+
+  @Field(() => Number,{ nullable: true })
+  @Column({ default: 0 })
+  LocationID!: number;
+
+  @Field()
+  @Column()
+  organizationId!: number;
+
+  @Field()
+  Phone!: string;
+
+  @Field()
+  Email!: string;
+}
+
 @ObjectType()
-export class PaginatedReciever {
+export class EditRecieverResponse {
+  @Field(() => String)
+  message: string | undefined;
+
+  @Field(() => Boolean, { defaultValue: true })
+  success: boolean | undefined;
+
+  @Field(() => Reciever, { nullable: true })
+  reciever?: Reciever;
+}
+
+@ObjectType()
+export class PaginatedRecievers {
   @Field(() => [Reciever])
   recievers: Reciever[] | undefined;
 
@@ -46,9 +81,9 @@ export class PaginatedReciever {
 }
 
 @ObjectType()
-export class CreateRecieverResponse {
+export class CreateRecieversResponse {
   @Field(() => Reciever, { nullable: true })
-  recievers!: Reciever;
+  reciever!: Reciever;
 
   @Field()
   message!: string;
