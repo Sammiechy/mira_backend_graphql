@@ -9,9 +9,10 @@ export class ShipperResolver {
    @Mutation(() => CreateShipperResponse)
    async createShipper(
     @Arg("Name") Name: string,
-    @Arg("LocationID", () => Int, { nullable: true }) LocationID: number,
+    @Arg("LocationID") LocationID: string,
     @Arg("Phone") Phone: string,
     @Arg("Email") Email: string,
+    @Arg("address") address: string,  
     @Arg("organizationId") organizationId: number
   ): Promise<CreateShipperResponse> {
 
@@ -21,6 +22,7 @@ export class ShipperResolver {
         Phone,
         Email,
         organizationId,
+        address
       });
 
     const savedShipper :any = await this.shipperRepository.save(shipperData);

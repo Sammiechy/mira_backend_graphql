@@ -9,9 +9,10 @@ export class RecieverResolver {
    @Mutation(() => CreateRecieversResponse)
    async createReciever(
     @Arg("Name") Name: string,
-    @Arg("LocationID", () => Int, { nullable: true }) LocationID: number,
+    @Arg("LocationID") LocationID: string,
     @Arg("Phone") Phone: string,
     @Arg("Email") Email: string,
+    @Arg("address") address:string,
     @Arg("organizationId") organizationId: number
   ): Promise<CreateRecieversResponse> {
 
@@ -20,6 +21,7 @@ export class RecieverResolver {
         LocationID,
         Phone,
         Email,
+        address,
         organizationId,
       });
 

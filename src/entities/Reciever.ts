@@ -12,9 +12,9 @@ export class Reciever {
     @Column()
     Name!: string;
 
-    @Field(() => Number,{ nullable: true })
-    @Column({ default: 0 })
-    LocationID!: number;
+    @Field()
+    @Column()
+    LocationID!: string;
 
     @Field()
     @Column()
@@ -23,6 +23,10 @@ export class Reciever {
     @Field()
     @Column()
     Email!: string;
+
+    @Field({ nullable: true })
+    @Column()
+    address!: string;
 
     @Field()
     @Column()
@@ -44,13 +48,17 @@ export class RecieverInput {
   @Field()
   Name!: string;
 
-  @Field(() => Number,{ nullable: true })
-  @Column({ default: 0 })
-  LocationID!: number;
+  @Field()
+  @Column()
+  LocationID!: string;
 
   @Field()
   @Column()
   organizationId!: number;
+
+  @Field({ nullable: true })
+  @Column()
+  address!: string;
 
   @Field()
   Phone!: string;

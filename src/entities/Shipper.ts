@@ -12,13 +12,17 @@ export class Shipper {
     @Column()
     Name!: string;
 
-    @Field(() => Number,{ nullable: true })
-    @Column({ default: 0 })
-    LocationID!: number;
+    @Field()
+    @Column()
+    LocationID!: string;
 
     @Field()
     @Column()
     Phone!: string;
+
+    @Field({ nullable: true })
+    @Column()
+    address!: string;
 
     @Field()
     @Column()
@@ -44,13 +48,17 @@ export class ShipperInput {
   @Field()
   Name!: string;
 
-  @Field(() => Number,{ nullable: true })
-  @Column({ default: 0 })
-  LocationID!: number;
+  @Field()
+  @Column()
+  LocationID!: string;
 
   @Field()
   @Column()
   organizationId!: number;
+
+  @Field({ nullable: true })
+    @Column()
+    address!: string;
 
   @Field()
   Phone!: string;

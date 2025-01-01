@@ -12,23 +12,36 @@ export class Location {
   @Column({ type: 'varchar', length: 255 })
   Address1!: string; 
 
+  @Field(() => String)
+  @Column({ type: 'varchar', length: 255 })
+  places_id!: string; 
+
   @Field({ nullable: true })
   @Column({ type: 'varchar', length: 255, nullable: true }) 
   Address2?: string;
 
-  @Field(() => String)
+  @Field({nullable: true})
   @Column({ type: 'varchar', length: 100 })
   City!: string;
 
-  @Field(() => String)
+  @Field({nullable: true})
   @Column({ type: 'varchar', length: 100 })
   State_Province!: string;
 
-  @Field(() => String)
+  @Field( {nullable: true} )
   @Column({ type: 'varchar', length: 100 })
   PostalCode_Zip!: string;
 
-  @Field(() => String)
+  @Field({nullable: true})
   @Column({ type: 'varchar', length: 100 })
   Country!: string;
+}
+
+@ObjectType()
+export class CreateLocationResponse {
+  @Field(() => Location, { nullable: true })
+  location!: Location;
+
+  @Field()
+  message!: string;
 }
