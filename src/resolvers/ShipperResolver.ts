@@ -1,6 +1,7 @@
 import { Resolver, Query, Mutation, Arg, Ctx, Int } from 'type-graphql';
 import { AppDataSource } from '../data-source';
 import { CreateShipperResponse, EditShipperResponse, PaginatedShippers, Shipper, ShipperInput } from '../entities/Shipper';
+import { Organization } from '../entities/Organization';
 
 
 @Resolver(Shipper)
@@ -88,17 +89,35 @@ export class ShipperResolver {
         // Find the organization by ID
         const shipper = await this.shipperRepository.findOne({
           where: { id, isDeleted: false },
+          relations: ['organization'],
         });
+
+       
     
         if (!shipper) {
           throw new Error('Organization not found.');
         }
-    
-        // Update the organization with new data
-        Object.assign(shipper, data);
-    
-        // Save the updated organization
-        await this.shipperRepository.save(shipper);
+
+        if (data.organizationId) {
+          const organization = await AppDataSource.getRepository(Organization).findOne({
+            where: { id: data.organizationId },
+          });
+
+        if (!organization) {
+          throw new Error('Organization not found.');
+        }
+        shipper.organization = organization;
+      }
+
+        Object.assign(shipper, {
+          Name: data.Name ?? shipper.Name,
+          LocationID: data.LocationID ?? shipper.LocationID,
+          Phone: data.Phone ?? shipper.Phone,
+          Email: data.Email ?? shipper.Email,
+          address: data.address ?? shipper.address,
+        })
+
+         await this.shipperRepository.save(shipper);
     
         return {
           message: 'Shipper updated successfully',

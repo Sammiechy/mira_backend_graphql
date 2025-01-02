@@ -1,6 +1,7 @@
 import { Resolver, Query, Mutation, Arg, Ctx, Int } from 'type-graphql';
 import { AppDataSource } from '../data-source';
 import { CreateRecieversResponse, EditRecieverResponse, PaginatedRecievers, Reciever, RecieverInput } from '../entities/Reciever';
+import { Organization } from '../entities/Organization';
 
 
 @Resolver(Reciever)
@@ -88,14 +89,31 @@ export class RecieverResolver {
         // Find the organization by ID
         const reciever = await this.recieverRepository.findOne({
           where: { id, isDeleted: false },
+          relations: ['organization'],
         });
     
         if (!reciever) {
           throw new Error('Reciever not found.');
         }
+          if (data.organizationId) {
+                  const organization = await AppDataSource.getRepository(Organization).findOne({
+                    where: { id: data.organizationId },
+                  });
+        
+                if (!organization) {
+                  throw new Error('Organization not found.');
+                }
+                reciever.organization = organization;
+              }
     
         // Update the organization with new data
-        Object.assign(reciever, data);
+        Object.assign(reciever, {
+          Name: data.Name ?? reciever.Name,
+          LocationID: data.LocationID ?? reciever.LocationID,
+          Phone: data.Phone ?? reciever.Phone,
+          Email: data.Email ?? reciever.Email,
+          address: data.address ?? reciever.address,
+        })
     
         // Save the updated organization
         await this.recieverRepository.save(reciever);
