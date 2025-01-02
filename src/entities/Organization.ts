@@ -13,13 +13,17 @@ export class Organization {
     @Column()
     Name!: string;
 
-    @Field(() => Number,{ nullable: true })
-    @Column({ default: 0 })
-    LocationID!: number;
+    @Field()
+    @Column()
+    LocationID!: string;
   
     @Field()
     @Column()
     Website!: string;
+
+    @Field()
+    @Column()
+    address!: string;
 
     @Field()
     @Column()
@@ -45,9 +49,13 @@ export class OrganizationInput {
   @Field()
   Name!: string;
 
-  @Field(() => Number,{ nullable: true })
-  @Column({ default: 0 })
-  LocationID!: number;
+  @Field()
+  @Column()
+  LocationID!: string;
+
+  @Field()
+  @Column()
+  address!: string;
 
   @Field()
   Website!: string;
