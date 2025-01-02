@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'typeorm';
 import { Field, InputType, Int, ObjectType } from 'type-graphql';
+import { Organization } from './Organization';
 
 @ObjectType()
 @Entity()
@@ -28,9 +29,9 @@ export class Reciever {
     @Column()
     address!: string;
 
-    @Field()
-    @Column()
-    organizationId!: number;
+    @Field(() => Organization) 
+    @ManyToOne(() => Organization, { eager: true }) 
+    organization!: Organization;
 
 //   @OneToMany(() => User, (user) => user.organizationId)
 //     users!: User[];

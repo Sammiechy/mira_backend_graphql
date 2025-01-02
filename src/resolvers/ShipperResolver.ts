@@ -21,8 +21,8 @@ export class ShipperResolver {
         LocationID,
         Phone,
         Email,
-        organizationId,
-        address
+        address,
+        organization: { id: organizationId }
       });
 
     const savedShipper :any = await this.shipperRepository.save(shipperData);
@@ -38,7 +38,8 @@ export class ShipperResolver {
          ): Promise<Shipper | null> {
            try {
              const shipper = await this.shipperRepository.findOne({
-               where: { id, isDeleted: false }, // Ensure it hasn't been soft-deleted
+               where: { id, isDeleted: false }, 
+               relations: ['organization'],
              });
        
              if (!shipper) {
@@ -126,6 +127,7 @@ export class ShipperResolver {
                 where: { isDeleted: false }, 
                 skip,
                 take: limit,
+                relations: ['organization'],
               });
         
                const totalCount = await this.shipperRepository.count();

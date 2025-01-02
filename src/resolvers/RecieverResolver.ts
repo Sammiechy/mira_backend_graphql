@@ -22,7 +22,7 @@ export class RecieverResolver {
         Phone,
         Email,
         address,
-        organizationId,
+        organization: { id: organizationId }
       });
 
     const savedShipper :any = await this.recieverRepository.save(recieverData);
@@ -39,7 +39,8 @@ export class RecieverResolver {
            try {
              const reciever = await this.recieverRepository.findOne({
                where: { id, isDeleted: false }, // Ensure it hasn't been soft-deleted
-             });
+               relations: ['organization'],
+              });
        
              if (!reciever) {
                throw new Error('Reciever not found.');
@@ -126,6 +127,7 @@ export class RecieverResolver {
                 where: { isDeleted: false }, 
                 skip,
                 take: limit,
+                relations: ['organization'],
               });
         
                const totalCount = await this.recieverRepository.count();
