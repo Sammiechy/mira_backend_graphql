@@ -50,7 +50,7 @@ export class User {
     status!: string;
 
     @Field()
-    @Column()
+    @Column({ nullable: true })
     organizationId!: number;
 
   // @ManyToOne(() => Organization, (organization) => organization.users)
