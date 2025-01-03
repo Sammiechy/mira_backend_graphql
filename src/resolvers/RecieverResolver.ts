@@ -131,7 +131,7 @@ export class RecieverResolver {
   
            @Query(() =>PaginatedRecievers)
            async getRecievers(
-             @Arg('page', () => Int, { defaultValue: 1 }) page: number,
+             @Arg('page', () => Int, { defaultValue: 0 }) page: number,
              @Arg('limit', () => Int, { defaultValue: 10 }) limit: number
            ): Promise<PaginatedRecievers> {
              try {
@@ -140,7 +140,7 @@ export class RecieverResolver {
                 throw new Error('Page and limit must be greater than 0');
               }
               
-               const skip = (page - 1) * limit;
+              const skip = (page - 1) * limit;
                const recievers = await this.recieverRepository.find({
                 where: { isDeleted: false }, 
                 skip,

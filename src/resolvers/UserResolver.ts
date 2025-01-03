@@ -10,6 +10,7 @@ import { BlacklistedToken } from '../entities/TokenEntity';
 import crypto from "crypto";
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 import { Not } from "typeorm";
+import { Organization } from '../entities/Organization';
 // import { sendResetEmail } from "../utils/emailUtils";
 
 const userRepository = AppDataSource.getRepository(User);
@@ -70,24 +71,44 @@ const userRepository = AppDataSource.getRepository(User);
 
 @Resolver(User)
 export class UserResolver {
-  @Query(() => [User])
+  @Query(() => PaginatedUsers)
   async users(
     @Arg('limit', { defaultValue: 10 }) limit: number,
     @Arg('offset', { defaultValue: 0 }) offset: number,
     @Arg('excludeId', { nullable: true }) excludeId?: number,
-  ): Promise<User[]> {
+  ): Promise<PaginatedUsers> {
     try {
       const userRepository = AppDataSource.getRepository(User);
-      const query = userRepository.createQueryBuilder('user')
+
+      const totalCountQuery = userRepository.createQueryBuilder('user');
+      if (excludeId) {
+        totalCountQuery.where('user.id != :excludeId', { excludeId });
+      }
+      const totalCount = await totalCountQuery.getCount();
+
+      const paginatedQuery = userRepository.createQueryBuilder('user')
+      .leftJoinAndSelect("user.organization", "organization")
       .take(limit)
       .skip(offset);
+
       if (excludeId) {
-        if (excludeId) {
-          query.where('user.id != :excludeId', { excludeId });
-        }
-        
+        paginatedQuery.where('user.id != :excludeId', { excludeId });
       }
-      return query.getMany();
+  
+      const users = await paginatedQuery.getMany();
+
+      
+      // if (excludeId) {
+      //   if (excludeId) {
+      //     query.where('user.id != :excludeId', { excludeId });
+      //   }
+        
+      // }
+      // const users = await query.getMany();
+      return {
+        users,
+        totalCount,
+      }
     } catch (error) {
       throw new Error("Error fetching users");
     }
@@ -242,12 +263,34 @@ export class UserResolver {
       role,
       type,
       status,
-      organizationId,
+      organization: { id: organizationId },
       password :hashedPassword,
     });
 
     return await userRepository.save(newUser);
   }
+
+    @Query(() => User, { nullable: true })
+           async getUserById(
+             @Arg('id', () => Int) id: number
+           ): Promise<User | null> {
+             try {
+               const user =  AppDataSource.getRepository(User).findOne({
+                  where: { id }, 
+                 relations: ['organization'],
+               });
+         
+               if (!user) {
+                 throw new Error('Organization not found.');
+               }
+         
+               return user;
+             } catch (error) {
+               console.error('Error fetching user by ID:', error);
+               throw new Error('Failed to fetch user by ID.');
+             }
+           }
+  
 
   @Mutation(() => User)
 async editUser(
@@ -264,11 +307,21 @@ async editUser(
 ): Promise<User> {
   const userRepository = AppDataSource.getRepository(User);
 
-  const user = await userRepository.findOne({ where: { id } });
+  const user = await userRepository.findOne({ where: { id } ,relations: ['organization'], });
 
   if (!user) {
     throw new Error("User not found");
   }
+
+   if (organizationId) {
+            const organization = await AppDataSource.getRepository(Organization).findOne({
+              where: { id: organizationId },
+            });
+            if (!organization) {
+              throw new Error('Organization not found.');
+            }
+            user.organization = organization;
+          }
 
   if (firstName !== undefined) user.firstName = firstName;
   if (lastName !== undefined) user.lastName = lastName;
@@ -296,33 +349,7 @@ async deleteUsers(@Arg("ids", () => [Number]) ids: number[]): Promise<boolean> {
   return true;
 }
 
-  // @Query(() =>PaginatedUsers)
-  //          async getUsers(
-  //            @Arg('page', () => Int, { defaultValue: 1 }) page: number,
-  //            @Arg('limit', () => Int, { defaultValue: 10 }) limit: number
-  //          ): Promise<PaginatedUsers> {
-  //            try {
-        
-  //             if (page < 1 || limit < 1) {
-  //               throw new Error('Page and limit must be greater than 0');
-  //             }
-              
-  //              const skip = (page - 1) * limit;
-  //              const userRepository =  AppDataSource.getRepository(User);
-  //              const users = await userRepository.find({
-  //               where: { isDeleted: false }, 
-  //               skip,
-  //               take: limit,
-  //               relations: ['organization'],
-  //             });
-        
-  //              const totalCount = await userRepository.count();
-  //              return { users, totalCount };
-  //            } catch (error) {
-  //              console.error('Error fetching users:', error);
-  //              throw new Error('Failed to fetch users.');
-  //            }
-  //          }
+
 
 @Mutation(() => Boolean)
 async reset_Password(
@@ -347,114 +374,3 @@ async reset_Password(
 }
 }
 
-//---------------------------------------------------------------------------------------------------
-// export const UserResolver = {
-//   Query: {
-//     users: async () => {
-//       const userRepository = AppDataSource.getRepository(User);
-//       return await userRepository.find();
-//     },
-//   },
-//   Mutation: {
-//     createUser: async (
-//       _: any,
-//       { firstName, lastName, phone, email, role, organizationId, type, password, status }: any
-//     ) => {
-//       try {
-//         console.log("Creating user with:", { firstName, lastName, phone, email, role, organizationId, type, status });
-    
-//         // Check for missing fields or invalid input
-//         if (!firstName || !lastName || !phone || !email || !role || !organizationId || !type || !password || !status) {
-//           throw new Error("Missing required fields.");
-//         }
-    
-//         const userRepository = AppDataSource.getRepository(User);
-    
-//         // Ensure the email is unique
-//         const existingUser = await userRepository.findOne({ where: { email } });
-//         if (existingUser) {
-//           throw new Error("email already in use.");
-//         }
-    
-//         const hashedpassword = await bcrypt.hash(password, 10);
-    
-//         const user = userRepository.create({
-//           firstName,
-//           lastName,
-//           phone,
-//           email,
-//           role,
-//           organizationId:parseInt(organizationId),
-//           type,
-//           password: hashedpassword,
-//           status,
-//         });
-    
-//         await userRepository.save(user);
-    
-//         console.log("User created successfully:", user);
-//         return user;
-//       } catch (error:any) {
-//         console.error("Error creating user:", error);
-//         throw new Error(`Failed to create user: ${error.message}`);
-//       }
-//     },
-//     signIn: async (_: any, { email, password }: { email: string; password: string }) => {
-//       try {
-//         console.log("Signing in user with email:", email);
-
-//         const userRepository = AppDataSource.getRepository(User);
-
-//         // Find the user by email
-//         const user:any = await userRepository.findOne({ where: { email } });
-//         if (!user) {
-//           throw new Error("User not found.");
-//         }
-
-//         // Compare the provided password with the stored hashed password
-//         const ispasswordValid = bcrypt.compare(password, user.password);
-//         if (!ispasswordValid) {
-//           throw new Error("Invalid password.");
-//         }
-
-//         // Generate a JWT token
-//         const token = jwt.sign(
-//           { id: user.id, email: user.email, role: user.role },
-//           JWT_SECRET,
-//           { expiresIn: "1h" }
-//         );
-
-//         console.log("User signed in successfully:", user);
-
-//         // Return the token and user details
-//         return {
-//           token,
-//           user,
-//         };
-//       } catch (error: any) {
-//         console.error("Error during sign-in:", error);
-//         throw new Error(`Failed to sign in: ${error.message}`);
-//       }
-//     },
-
-
-//     signOut: async (_: any, { token }: { token: string }) => {
-//       try {
-//         // Invalidate the token by adding it to a blacklist
-//         if (!token) {
-//           throw new Error("No token provided.");
-//         }
-
-//         invalidatedTokens.add(token);
-
-//         // Optionally, clear the token client-side by providing feedback to the user
-//         return true; // Sign-out successful
-//       } catch (error: any) {
-//         throw new Error(`Failed to sign out: ${error.message}`);
-//       }
-//     },
-    
-
-  
-//   },
-// };

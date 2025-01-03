@@ -49,9 +49,9 @@ export class User {
     @Column()
     status!: string;
 
-    // @Field(() => Organization) 
-    // @ManyToOne(() => Organization, { eager: true }) 
-    // organization!: Organization;
+    @Field(() => Organization) 
+    @ManyToOne(() => Organization, { eager: true }) 
+    organization!: Organization;
 
     @Field()
     @Column({ nullable: true })
@@ -60,6 +60,7 @@ export class User {
   // @ManyToOne(() => Organization, (organization) => organization.users)
   //   @JoinColumn({ name: 'organizationId' })
   //   organization!: Organization;
+
   @Field(() => String) // Optionally expose this if needed for GraphQL
 @Column()
 password!: string;
