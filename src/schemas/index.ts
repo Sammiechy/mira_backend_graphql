@@ -6,10 +6,11 @@ import { RecieverResolver } from "../resolvers/RecieverResolver";
 import { PlaceResolver } from "../resolvers/PlacesResolver";
 import { LocationResolver } from "../resolvers/LocationResolver";
 import { EquipmentResolver } from "../resolvers/EquipmentResolvers";
+import { DriversResolver } from "../resolvers/DriversResolvers";
 
 export const createSchema = () => {
   return buildSchema({
-    resolvers: [UserResolver, OrganizationResolver,ShipperResolver, RecieverResolver,PlaceResolver,LocationResolver,EquipmentResolver],
+    resolvers: [UserResolver, OrganizationResolver,ShipperResolver, RecieverResolver,PlaceResolver,LocationResolver,EquipmentResolver,DriversResolver],
     validate: false,
   });
 };

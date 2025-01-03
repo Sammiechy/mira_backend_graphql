@@ -86,8 +86,6 @@ export class EquipmentResolver {
         relations: ['organization'],
       });
 
-
-
       if (!equipment) {
         throw new Error('Organization not found.');
       }
