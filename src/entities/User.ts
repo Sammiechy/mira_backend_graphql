@@ -49,6 +49,10 @@ export class User {
     @Column()
     status!: string;
 
+    // @Field(() => Organization) 
+    // @ManyToOne(() => Organization, { eager: true }) 
+    // organization!: Organization;
+
     @Field()
     @Column({ nullable: true })
     organizationId!: number;
@@ -60,11 +64,24 @@ export class User {
 @Column()
 password!: string;
 
+// @Field()
+// @Column({ default: false })
+// isDeleted!: boolean;
+
   // @Field()
   //   @Column({ default: false })
   //   isDeleted!: boolean;
   // password: string | undefined;
 
+}
+
+@ObjectType()
+export class PaginatedUsers {
+  @Field(() => [User])
+  users: User[] | undefined;
+
+  @Field(() => Int)
+  totalCount: number | undefined;
 }
 
 @ObjectType()

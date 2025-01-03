@@ -1,9 +1,9 @@
 // src/resolvers/UserResolver.ts
-import { Resolver, Query, Mutation, Arg, Ctx } from 'type-graphql';
+import { Resolver, Query, Mutation, Arg, Ctx, Int } from 'type-graphql';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { AppDataSource } from '../data-source';
-import { SignInResponse, SignOutResponse, SignUpResponse, User } from '../entities/User';
+import { PaginatedUsers, SignInResponse, SignOutResponse, SignUpResponse, User } from '../entities/User';
 import { generateToken } from '../utils/jwt';
 import { signUpUser } from '../utils/cognito';
 import { BlacklistedToken } from '../entities/TokenEntity';
@@ -295,6 +295,34 @@ async deleteUsers(@Arg("ids", () => [Number]) ids: number[]): Promise<boolean> {
   await userRepository.remove(users);
   return true;
 }
+
+  // @Query(() =>PaginatedUsers)
+  //          async getUsers(
+  //            @Arg('page', () => Int, { defaultValue: 1 }) page: number,
+  //            @Arg('limit', () => Int, { defaultValue: 10 }) limit: number
+  //          ): Promise<PaginatedUsers> {
+  //            try {
+        
+  //             if (page < 1 || limit < 1) {
+  //               throw new Error('Page and limit must be greater than 0');
+  //             }
+              
+  //              const skip = (page - 1) * limit;
+  //              const userRepository =  AppDataSource.getRepository(User);
+  //              const users = await userRepository.find({
+  //               where: { isDeleted: false }, 
+  //               skip,
+  //               take: limit,
+  //               relations: ['organization'],
+  //             });
+        
+  //              const totalCount = await userRepository.count();
+  //              return { users, totalCount };
+  //            } catch (error) {
+  //              console.error('Error fetching users:', error);
+  //              throw new Error('Failed to fetch users.');
+  //            }
+  //          }
 
 @Mutation(() => Boolean)
 async reset_Password(

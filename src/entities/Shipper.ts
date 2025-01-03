@@ -29,6 +29,10 @@ export class Shipper {
     @Column()
     Email!: string;
 
+    @Field()
+    @Column()
+    organizationId!: number;
+
     @Field(() => Organization) 
     @ManyToOne(() => Organization, { eager: true }) 
     organization!: Organization;
