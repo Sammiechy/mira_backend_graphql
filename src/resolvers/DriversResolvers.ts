@@ -9,13 +9,24 @@ export class DriversResolver {
   private driversRepository = AppDataSource.getRepository(Drivers);
   @Mutation(() => CreateDriversResponse)
   async createDrivers(
-    @Arg("FirstName") FirstName: string,
-    @Arg("LastName") LastName: string,
-    @Arg("Email") Email: string,
-    @Arg("Phone") Phone: string,
-    @Arg("PaymentMethod", () => PaymentMethod) PaymentMethod: PaymentMethod,
-    @Arg("Notes") Notes: string,
-    @Arg("organizationId") organizationId: number
+    @Arg("FirstName") FirstName?: string,
+    @Arg("LastName") LastName?: string,
+    @Arg("Email") Email?: string,
+    @Arg("Phone") Phone?: string,
+    @Arg("PaymentMethod", () => PaymentMethod) PaymentMethod?: PaymentMethod,
+    @Arg("Notes") Notes?: string,
+    @Arg("organizationId") organizationId?: number,
+    @Arg("DOB", { nullable: true }) DOB?: string,
+    @Arg("Gender", { nullable: true }) Gender?: string,
+    @Arg("Primary_Phone") Primary_Phone?: string,
+    @Arg("PrimaryCitizenship", { nullable: true }) PrimaryCitizenship?: string,
+    @Arg("SecondaryCitizenship", { nullable: true }) SecondaryCitizenship?: string,
+    @Arg("address", { nullable: true }) address?: string,
+    // @Arg("Street", { nullable: true }) Street?: string,
+    // @Arg("City", { nullable: true }) City?: string,
+    // @Arg("State", { nullable: true }) State?: string,
+    // @Arg("ZipCode", { nullable: true }) ZipCode?: string,
+    // @Arg("Country", { nullable: true }) Country?: string,
   ): Promise<CreateDriversResponse> {
 
     
@@ -26,6 +37,17 @@ export class DriversResolver {
       Phone,
       PaymentMethod,
       Notes,
+      DOB,
+      Gender,
+      PrimaryCitizenship,
+      SecondaryCitizenship,
+      address,
+      // Street,
+      // City,
+      // State,
+      // ZipCode,
+      Primary_Phone,
+      // Country,
       organization: { id: organizationId }
     });
 
@@ -115,6 +137,12 @@ export class DriversResolver {
         LastName: data.LastName ?? drivers.LastName,
         Email: data.Email ?? drivers.Email,
         Phone: data.Phone ?? drivers.Phone,
+        Gender: data.Gender ?? drivers.Gender,
+        DOB: data.DOB ?? drivers.DOB,
+        PrimaryCitizenship: data.PrimaryCitizenship ?? drivers.PrimaryCitizenship,
+        SecondaryCitizenship: data.SecondaryCitizenship ?? drivers.SecondaryCitizenship,
+        address: data.address ?? drivers.address,
+        Primary_Phone: data.Primary_Phone ?? drivers.Primary_Phone,
         PaymentMethod: data.PaymentMethod ?? drivers.PaymentMethod,
         Notes: data.Notes ?? drivers.Notes,
       })

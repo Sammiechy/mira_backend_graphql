@@ -129,7 +129,7 @@ export class UserResolver {
     @Arg("password") password: string,
     @Arg("status") status: string,
     @Arg("type") type: string,
-    @Arg("organizationId") organizationId: number
+    @Arg("organizationId", { nullable: true }) organizationId?: number
   ): Promise<SignUpResponse> {
     // Check if organization exists
     // const organization = await AppDataSource.getRepository(Organization).findOne({

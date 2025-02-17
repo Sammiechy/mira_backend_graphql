@@ -49,13 +49,20 @@ export class User {
     @Column()
     status!: string;
 
-    @Field(() => Organization) 
-    @ManyToOne(() => Organization, { eager: true }) 
-    organization!: Organization;
+ 
+    @Field(() => Organization, { nullable: true }) 
+    @ManyToOne(() => Organization, (organization) => organization.users, {
+      eager: true,
+      nullable: true,
+      onDelete: 'SET NULL' // Prevents foreign key constraint issues
+    }) 
 
-    @Field()
-    @Column({ nullable: true })
-    organizationId!: number;
+    @JoinColumn({ name: 'organizationId' }) // Explicitly link foreign key
+    organization!: Organization | null;
+    
+    @Field(() => Int, { nullable: true }) // Fix: Explicit GraphQL type
+    @Column({ nullable: true }) 
+    organizationId!: number | null;
 
   // @ManyToOne(() => Organization, (organization) => organization.users)
   //   @JoinColumn({ name: 'organizationId' })
