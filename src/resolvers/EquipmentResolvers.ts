@@ -2,6 +2,7 @@ import { Resolver, Query, Mutation, Arg, Ctx, Int } from 'type-graphql';
 import { AppDataSource } from '../data-source';
 import { Organization } from '../entities/Organization';
 import { CreateEquipmentResponse, EditEquipmentResponse, Equipment, EquipmentInput, PaginatedEquipment } from '../entities/Equipment';
+import { ILike } from 'typeorm';
 
 
 @Resolver(Equipment)
@@ -143,6 +144,41 @@ export class EquipmentResolver {
     } catch (error) {
       console.error('Error fetching equipment:', error);
       throw new Error('Failed to fetch equipment.');
+    }
+  }
+
+  @Query(() => [Equipment])
+  async searchEquipment(
+    @Arg("Type", () => String, { nullable: true }) Type?: string,
+    // @Arg("organization", () => String, { nullable: true }) organization?: string
+  ): Promise<Equipment[]|null> {
+    try {
+      // const query = this.equipmentRepository
+      //   .createQueryBuilder("equipment")
+      //   .where("equipment.isDeleted = :isDeleted", { isDeleted: false });
+        const query = await this.equipmentRepository.find({
+                      where: {
+                        Type: ILike(`%${Type}%`), 
+                        // organization:ILike(`%${organization}%`), 
+                        isDeleted: false,
+                      },
+                      relations: ['organization'],
+                    });
+  
+      // if (Type) {
+      //   query.andWhere("equipment.Type ILIKE :Type", { Type: `%${Type}%` });
+      // }
+  
+      // if (organization) {
+      //   query.andWhere("equipment.organization ILIKE :organization", {
+      //     organization: `%${organization}%`,
+      //   });
+      // }
+  
+      return  query;
+    } catch (error) {
+      console.error("Error searching equipment:", error);
+      throw new Error("Failed to search equipment.");
     }
   }
 }

@@ -185,4 +185,28 @@ export class DriversResolver {
       throw new Error('Failed to fetch drivers.');
     }
   }
+   
+  @Query(() => [Drivers])
+  async searchDriversByName(
+    @Arg('name', () => String) name: string
+  ): Promise<Drivers[]> {
+    try {
+      const drivers = await this.driversRepository
+        .createQueryBuilder('driver')
+        .where(
+          'LOWER(driver.FirstName) LIKE :name OR LOWER(driver.LastName) LIKE :name', 
+          { name: `%${name.toLowerCase()}%` }
+        )
+        .andWhere('driver.isDeleted = false')
+        .leftJoinAndSelect('driver.organization', 'organization')
+        .addSelect('organization.Name') // Ensure correct field selection
+        .getMany();
+  
+      return drivers;
+    } catch (error) {
+      console.error('Error searching for drivers:', error);
+      throw new Error('Failed to search for drivers.');
+    }
+  }
+
 }

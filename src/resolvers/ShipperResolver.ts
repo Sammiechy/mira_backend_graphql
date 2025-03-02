@@ -2,6 +2,7 @@ import { Resolver, Query, Mutation, Arg, Ctx, Int } from 'type-graphql';
 import { AppDataSource } from '../data-source';
 import { CreateShipperResponse, EditShipperResponse, PaginatedShippers, Shipper, ShipperInput } from '../entities/Shipper';
 import { Organization } from '../entities/Organization';
+import { ILike } from 'typeorm';
 
 
 @Resolver(Shipper)
@@ -156,4 +157,34 @@ export class ShipperResolver {
                throw new Error('Failed to fetch shippers.');
              }
            }
+
+             @Query(() => [Shipper])
+                      async searchShipper(
+                       @Arg("name",()=> String) name:string
+                      ):Promise<Shipper[]>{
+                       // try {
+                       //   const searchReciever = this.recieverRepository
+                       //     .createQueryBuilder("reciever")
+                       //     .where("reciever.isDeleted = :isDeleted", { isDeleted: false });
+                     
+                       //   if (name) {
+                       //     searchReciever.andWhere("reciever.Name ILIKE :name", { name: `%${name}%` }); 
+                       //   }
+                     
+                       //   return await searchReciever.getMany(); 
+                       try {
+                         const recievers = await this.shipperRepository.find({
+                           where: {
+                             Name: ILike(`%${name}%`), 
+                             isDeleted: false,
+                           },
+                           relations: ['organization'],
+                         });
+                     
+                         return recievers;
+                       } catch (err) {
+                         console.error("Error searching shipper:", err);
+                         throw new Error("Failed to search shipper.");
+                       }
+                      }
 }

@@ -2,6 +2,7 @@ import { Resolver, Query, Mutation, Arg, Ctx, Int } from 'type-graphql';
 import { AppDataSource } from '../data-source';
 import { CreateRecieversResponse, EditRecieverResponse, PaginatedRecievers, Reciever, RecieverInput } from '../entities/Reciever';
 import { Organization } from '../entities/Organization';
+import { ILike } from 'typeorm';
 
 
 @Resolver(Reciever)
@@ -154,5 +155,35 @@ export class RecieverResolver {
                console.error('Error fetching recievers:', error);
                throw new Error('Failed to fetch recievers.');
              }
+           }
+
+           @Query(() => [Reciever])
+           async searchReciever(
+            @Arg("name",()=> String) name:string
+           ):Promise<Reciever[]>{
+            // try {
+            //   const searchReciever = this.recieverRepository
+            //     .createQueryBuilder("reciever")
+            //     .where("reciever.isDeleted = :isDeleted", { isDeleted: false });
+          
+            //   if (name) {
+            //     searchReciever.andWhere("reciever.Name ILIKE :name", { name: `%${name}%` }); 
+            //   }
+          
+            //   return await searchReciever.getMany(); 
+            try {
+              const recievers = await this.recieverRepository.find({
+                where: {
+                  Name: ILike(`%${name}%`), 
+                  isDeleted: false,
+                },
+                relations: ['organization'],
+              });
+          
+              return recievers;
+            } catch (err) {
+              console.error("Error searching receiver:", err);
+              throw new Error("Failed to search receiver.");
+            }
            }
 }

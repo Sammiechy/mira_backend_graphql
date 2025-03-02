@@ -95,6 +95,27 @@ try{
      }
    }
 
+   @Query(()=>[Organization],{nullable:true})
+   async searchOrganization(
+    @Arg('name',()=>String, {nullable:true}) name?: string,
+    // @Arg('email',()=>String,{nullable:true}) email?: string
+   ):Promise<Organization[]| null>{
+    try{
+     const searchOrg= this.organizationRepository.createQueryBuilder("organization").where("organization.isDeleted = :isDeleted", { isDeleted: false })
+       if(name){
+        searchOrg.andWhere("organization.Name ILIKE :name",{name:`%${name}`});
+       }
+      //  if(email){
+      //   searchOrg.andWhere("organization.Email ILIKE :email",{email:`%${email}`})
+      //  }
+       const organizations =await searchOrg.getMany();
+       return organizations
+    }catch(error){
+      console.error('Error searching organizations:', error);
+      throw new Error('Failed to search organizations.');
+    }
+   }
+
    @Mutation(() => EditOrganizationResponse)
 async editOrganization(
   @Arg('id', () => Int) id: number,
