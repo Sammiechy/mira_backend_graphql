@@ -7,10 +7,12 @@ import { PlaceResolver } from "../resolvers/PlacesResolver";
 import { LocationResolver } from "../resolvers/LocationResolver";
 import { EquipmentResolver } from "../resolvers/EquipmentResolvers";
 import { DriversResolver } from "../resolvers/DriversResolvers";
-
+import { LoadsResolver } from "../resolvers/LoadsResolvers";
 export const createSchema = () => {
+  // const ShipperResolvers=[ShipperContactResolver]?.flat()
+
   return buildSchema({
-    resolvers: [UserResolver, OrganizationResolver,ShipperResolver, RecieverResolver,PlaceResolver,LocationResolver,EquipmentResolver,DriversResolver],
+    resolvers: [UserResolver, OrganizationResolver,ShipperResolver, RecieverResolver,PlaceResolver,LocationResolver,EquipmentResolver,DriversResolver,LoadsResolver],
     validate: false,
   });
 };
